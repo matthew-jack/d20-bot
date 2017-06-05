@@ -7,7 +7,7 @@ var Twitter = require('twitter');
 var Random = require('random-js');
 require('dotenv').config();
 // regexp to extract commands from DM input
-var re = /(\d+)[d](\d+)[+](\d+)/gi;
+
 // Set PRNG engine
 var engine = Random.engines.mt19937().autoSeed();
 
@@ -47,22 +47,32 @@ function handleDM(msg) {
   var sender_id = msg.sender_id;
   var text = msg.text;
   var string = "";
-  var command = text.match(re);
-
-  // Handle malformed input
-  if( typeof command[0] != "number" && typeof command[1] != "number") {
-    console.error('ERR: bad command entered: text');
-    botClient.post('direct_messages/new', { user_id: sender_id, text: 'Please enter a command in the format {times}d{sides} (e.g. \'2d6\' to roll a 6-die 2 times)' });
-    return;
-  }
 
   // Extract number of rolls/sides of die from DM text:
   //   Expecting "{times}d{sides}"
   //   times: command[0]
   //   sides: command[1]
   //   modified: command[2]
-  var roll = Random.dice(command[0],command[1])(engine);
-  foreach(roll) {
+  var command = text.match(/(\d+)/gi);
+
+  // Handle malformed input
+  if(command == null || command == "") {
+    console.error('ERR: bad command entered: ' + text);
+    botClient.post('direct_messages/new', { user_id: sender_id, text: 'Please enter a command in the format {times}d{sides}+{modifier} (e.g. \'2d6+5\' to roll a 6-die 2 times and add 5)' });
+    return;
+  }
+
+  // if dice count not specified, default to 1
+  if(command.length < 2) {
+    for(var i = 0; i < command.length; i++) {
+      command[i] = command[i+1];
+    }
+    command[0] = 1;
+  }
+  console.log(command);
+
+  for(var i = 0; i < parseInt(command[0]); i++) {
+    var roll = Random.integer(1, command[1])(engine);
     // Add modifier, if present
     if(command[2]) {
       roll = String(parseInt(roll) + parseInt(command[2]));
@@ -70,6 +80,8 @@ function handleDM(msg) {
     string += roll + " ";
   }
   string.trim();
+
   botClient.post('direct_messages/new', { user_id: sender_id, text: string });
+  console.log('DEV: SENT to ' + sender_id + ' (@' + msg.sender.screen_name + '): ' + string);
   return;
 }
