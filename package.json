@@ -1,0 +1,19 @@
+{
+  "name": "d20-bot",
+  "version": "0.1.0",
+  "description": "A Twitter bot to replace physical D&D dice.",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+  },
+  "author": "Matthew Jack <matthew-jack@uiowa.edu>",
+  "license": "Unlicense",
+  "engines": {
+    "node": "7.5.0",
+  },
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "twitter": "1.7.0",
+    "random-js": "latest",
+  },
+}
