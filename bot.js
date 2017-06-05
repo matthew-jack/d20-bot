@@ -64,10 +64,7 @@ function handleDM(msg) {
 
   // if dice count not specified, default to 1
   if(command.length < 2) {
-    for(var i = 0; i < command.length; i++) {
-      command[i+1] = command[i];
-    }
-    command[0] = 1;
+    command.unshift(1);
   }
 
   for(var i = 0; i < parseInt(command[0]); i++) {
