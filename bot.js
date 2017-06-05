@@ -69,7 +69,6 @@ function handleDM(msg) {
     }
     command[0] = 1;
   }
-  console.log(command);
 
   for(var i = 0; i < parseInt(command[0]); i++) {
     var roll = Random.integer(1, command[1])(engine);
